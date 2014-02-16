@@ -1,0 +1,19 @@
+{
+  "name": "Injector.js",
+  "title": "Injector.js",
+  "description": " Dependency injection implemented in JavaScript",
+  "version": "0.0.1",
+  "license": "MIT",
+  "scripts": {
+    "test": "node_modules/.bin/karma start karma.conf.js"
+  },
+  "devDependencies": {
+    "istanbul": "*",
+    "mocha": "*",
+    "karma": "*",
+    "karma-qunit": "*",
+    "karma-coverage" : "*",
+    "qunitjs": "*"
+  },
+  "keywords": []
+}
