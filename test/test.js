@@ -49,6 +49,8 @@
       notEqual($test, undefined,'$test must be not null.');
       equal($test.testMessage,'a new injection','test if $test is added.');
       equal($foo, undefined,'$foo was deleted and must be null.');
+      equal(this.testMessage, 'this is a test object', 'Could we find our teststring?');
+      equal(this, testObject,'this must be our testObject');
       tmp1 =true;
     });
     equal(tmp,testInjector,'callWithDependencies must be return the Injector.');
@@ -57,6 +59,8 @@
       notEqual($test, undefined,'$test must be not null.');
       equal($test.testMessage,'a new injection','test if $test is added.');
       equal($foo, undefined,'$foo was deleted and must be null.');
+      equal(this.testMessage, 'this is a test object', 'Could we find our teststring?');
+      equal(this, testObject,'this must be our testObject');
       tmp2 =true;
     }]);
     equal(tmp,testInjector,'callWithDependencies must be return the Injector.');
@@ -65,6 +69,8 @@
       notEqual($test, undefined,'$test must be not null.');
       equal($test.testMessage,'a new injection','test if $test is added.');
       equal($foo, undefined,'$foo was deleted and must be null.');
+      equal(this.testMessage, 'this is a test object', 'Could we find our teststring?');
+      equal(this, testObject,'this must be our testObject');
       tmp3 =true;
     });
     equal(tmp,testInjector,'callWithDependencies must be return the Injector.');
