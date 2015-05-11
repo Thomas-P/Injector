@@ -2,18 +2,23 @@
   "name": "Injector.js",
   "title": "Injector.js",
   "description": " Dependency injection implemented in JavaScript",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "license": "MIT",
   "scripts": {
-    "test": "node_modules/.bin/karma start karma.conf.js"
+    "test": "node_modules/.bin/karma start karma.conf.js",
+    "mocha": "./node_modules/.bin/mocha --require chai --reporter spec --ui bdd --require src/injector.js test/chai.js"
   },
   "devDependencies": {
     "istanbul": "*",
-    "mocha": "*",
-    "karma": "*",
-    "karma-qunit": "*",
-    "karma-coverage" : "*",
-    "qunitjs": "*"
+    "karma": "^0.12.31",
+    "karma-chai": "^0.1.0",
+    "karma-coverage": "*",
+    "karma-mocha": "^0.1.10",
+    "karma-phantomjs-launcher": "^0.1.4",
+    "karma-sinon": "^1.0.4",
+    "mocha": "^2.2.4",
+    "qunitjs": "*",
+    "sinon": "^1.14.1"
   },
   "keywords": []
 }

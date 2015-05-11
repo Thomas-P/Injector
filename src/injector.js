@@ -1,118 +1,180 @@
+'use strict';
 var Injector = (function() {
 
-  function getArguments(func) {
-  //This regex is from require.js
-  var FN_ARGS = /^function\s*[^\(]*\(\s*([^\)]*)\)/m;
-  var args = func.toString().match(FN_ARGS)[1].split(',');
-  return args;
-}
+    /**
+    *    extract the arguments from a given function
+    *    @param func {Function} - the given function
+    *    @return {Array} - array of arguments
+    */
+    var getArguments = function(func) {
+        if (!func || typeof func !== 'function' ) {
+            return;
+        }
+        
+        //This regex is from require.js
+        var FN_ARGS = /^function\s*[^\(]*\(\s*([^\)]*)\)/m;
+        var args = func
+            .toString()
+            .match(FN_ARGS)[1]
+            .split(',');
+        
+        return args;
+    };
 
-function extend(destination, source) {
-  for (var property in source) {
-    destination[property] = source[property];
-  }
-  return destination;
-}
+    
+    /**
+    *    get the dependencies by 
+    *    @param dependencyIdentifers {Array} - Array of dependency identifer. These will be identified by name
+    *    @param dependencies {Object} - 
+    */
+    var resolveDependencies= function(dependencyIdentifers, dependencies) {
+        if (!dependencyIdentifers || !Array.isArray(dependencyIdentifers)) {
+            return;
+        }
+        dependencies = dependencies || {};
+        var resolveDeps = dependencyIdentifers.map(function(name) {
+            return dependencies[name];
+        });
+        return resolveDeps;
+    };
 
-function Injector(obj) {
-  if (!(this instanceof Injector))
-    return new Injector(obj);
-  var dependencies = { };
-  var obj = obj || { };
+    /**
+    *    add a dependency to the list of dependencies
+    *    @param name {String} - name/identifer of the dependency
+    *    @param functionality {Object} - the functionality, which should be injected
+    *    @param dependencies {Object} - the list of dependencies from the {Injector}
+    *    @return {Object} - list of dependencies
+    */
+    var addDependency = function(name, functionality, dependencies) {
+        if (typeof name !== 'string') {
+            console.warn('Could not add a dependency, identifer is not a string');
+            return;
+        }
+        dependencies = dependencies || {};
+        dependencies[name] = functionality;
+        return dependencies;
+    };
 
-  function resolveDependencies(deps) {
-    /*if (!Array.isArray(deps))
-      throw new Error("Requires an array");*/
-    var resolveDeps = [];
-    deps.forEach( function(name) {
-      resolveDeps.push( dependencies[name] );
-    } );
-    return resolveDeps;
-  }
- /**
-  * add an dependency
-  * @param name name of the dependency
-  * @param obj the dependency
-  */
-  function add(name, obj) {
-    if (typeof name != "string")
-      throw new Error("First parameter must be a string.");
-    dependencies[name] = obj;
-    return this;
-  }
- /**
-  * delete a dependency
-  */
-  function del(name) {
-    if (typeof name != "string")
-      throw new Error("First parameter must be a string.");
-    if (dependencies[name])
-      delete(dependencies[name]);
-      //dependencies[name] = undefined;
-    return this;
-  }
 
- /**
-  * They are three ways to call this function. 
-  *
-  * callWithDependencies( function($dep1,$dep2, ...) { ... } );
-  * 
-  * callWithDependencies( [ '$dep1','$dep2', ...], function($dep1,$dep2, ...) { ... } );
-  *
-  * callWithDependencies( [ '$dep1','$dep2', ..., function($dep1,$dep2, ...) { ... } ] ); 
-  *
-  * @return this
-  */
-  function callWithDependencies( ) {
-    if ( 0 === arguments.length )
-      return this;
-    var deps = [];
-    var func;
-    if ( "function" == typeof arguments[0] ) {
+    /**
+    *    delete a dependency
+    *    @param name {String} - name/identifer of the dependency
+    *    @param dependencies {Object} - the list of dependencies from the {Injector}
+    *    @return {Object} - list of dependencies
+    */
+    var deleteDependency = function(name, dependencies) {
+        if (typeof name !== 'string') {
+            console.warn('Could not delete the dependency, identifer is not a string');
+            return;
+        }
+        if (dependencies[name]) {
+            delete(dependencies[name]);
+        }
+        return dependencies;
+    };
 
-      // getting arguments of the function
-      deps = getArguments( arguments[0] );
-      func = arguments[0];
 
-    } else if ( Array.isArray( arguments[0] ) && arguments[1] && "function" == typeof arguments[1] ) {
+    /**
+    * These is the main method to inject dependencies
+    * 
+    *
+    * getDependencyInformation( function($dep1,$dep2, ...) { ... } );
+    * getDependencyInformation( [ '$dep1','$dep2', ...], function($dep1,$dep2, ...) { ... } );
+    *
+    */
+    var getDependencyInformation = function(dependencyIdentifer, func) {
+        if ( 0 === arguments.length ) {
+            // nothing to handle, done
+            return;
+        }
 
-      deps = arguments[0];
-      func = arguments[1];
+        if (typeof dependencyIdentifer === 'function') {
+            
+            func = dependencyIdentifer;
+            dependencyIdentifer = getArguments(func);
 
-    } else if ( Array.isArray( arguments[0] ) && "function" == typeof arguments[0][arguments[0].length-1] ) {
-      func = arguments[0][arguments[0].length-1];
-      arguments[0].pop();
-      deps = arguments[0];
+        } else if ( false === (Array.isArray(dependencyIdentifer) && typeof func === 'function') ) {
+            
+            console.warn('Could not handle parameter, while injection.');
+            return;
 
+        }
+
+        return [dependencyIdentifer, func];
+    };
+
+
+    /**
+    *
+    */
+    var injectDependencies = function(identifer, func, dependencies) {
+        var resolvedDependencies = resolveDependencies(identifer, dependencies);
+        return func.apply(func, resolvedDependencies);
+    };
+
+    /**
+    *
+    */
+    function Injector() {
+        if (!(this instanceof Injector)) {
+            return new Injector();
+        }
+
+        var dependencies= {};
+
+
+        /**
+        *    add a new dependency
+        *    @param name {String} - name of the dependency
+        *    @param functionality {Object} - the functionality which will be injected
+        */
+        this.add = function(name, functionality) {
+            addDependency(name, functionality, dependencies);
+            return this;
+        };
+
+
+        /**
+        *    removes a dependency
+        *    @param name {String} - name of the dependency
+        */
+        this.del = function(name) {
+            deleteDependency(name, dependencies);
+            return this;
+        };
+
+
+        /**
+        *    Allowes us to inject a function directly. 
+        *    It is possible to define the dependencies as parameter names in the function.
+        *    Then you only have to send the function as a parameter.
+        *    But this could be a problem, if you minimize your code.
+        *    @param identifer {Array} - A list of identifer for the function
+        *    @param func {Function} - the function, which should call
+        *    @return the result of the function 
+        */
+        this.inject = function() {
+            var dependInformation = getDependencyInformation.apply(null,arguments);
+            if (dependInformation) {
+                dependInformation.push(dependencies);
+                return injectDependencies.apply(null, dependInformation);
+            } else {
+                if (typeof arguments[0]=== 'function') {
+                    return arguments[0].call(arguments[0]);
+                }
+            }
+        };
+   
     }
 
-    // no given function
-    if (!func)
-      return this;
-
-    deps = resolveDependencies(deps);
-
-    func.apply(obj,deps);
-    return this;
-
-  }
-
-  var ex = {
-    add : add,
-    del : del,
-    callWithDependencies: callWithDependencies
-  };
-
-  extend(this,ex);
-
-  return this;
-}
-
-//Injector.prototype.constructor = new Injector();
-
-return Injector;
+    return Injector;
 })();
 
-window.Injector = Injector;
+if (typeof module !== 'undefined' && module !== null) {
+    module.exports = Injector;
+} else {
+    this.Injector = Injector;
+}
+
 
 //by http://stackoverflow.com/questions/20058391/javascript-dependency-injection
