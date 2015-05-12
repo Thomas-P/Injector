@@ -2,7 +2,7 @@
   "name": "Injector.js",
   "title": "Injector.js",
   "description": " Dependency injection implemented in JavaScript",
-  "version": "0.0.2",
+  "version": "0.1.0",
   "license": "MIT",
   "scripts": {
     "test": "node_modules/.bin/karma start karma.conf.js",
