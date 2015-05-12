@@ -17,7 +17,9 @@ var Injector = (function() {
             .toString()
             .match(FN_ARGS)[1]
             .split(',');
-        
+        args = args.map(function(item) {
+            return String(item).trim();
+        }); 
         return args;
     };
 
@@ -128,7 +130,7 @@ var Injector = (function() {
         *    @param name {String} - name of the dependency
         *    @param functionality {Object} - the functionality which will be injected
         */
-        this.add = function(name, functionality) {
+        this.addDependency = this.add = function(name, functionality) {
             addDependency(name, functionality, dependencies);
             return this;
         };
@@ -154,7 +156,7 @@ var Injector = (function() {
         *    replace the dependencies by a given object
         *    @param dependencyObject {Object} - object that will replace dependencies
         */
-        this.setDependencies = function(dependencyObject) {
+        this.setDependencies = this.set = function(dependencyObject) {
             dependencies = dependencyObject;
             return this;
         };
@@ -164,7 +166,7 @@ var Injector = (function() {
         *    removes a dependency
         *    @param name {String} - name of the dependency
         */
-        this.del = function(name) {
+        this.deleteDependency = this.del = function(name) {
             deleteDependency(name, dependencies);
             return this;
         };
