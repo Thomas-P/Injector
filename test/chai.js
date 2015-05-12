@@ -74,19 +74,89 @@ describe('Test',function() {
             });
             assert.equal(run, true);
 
+
+            run = false;
+            injector.inject(function() {
+                
+                run = true;
+            });
+            assert.equal(run, true);
+        });
+
+        it('should not break', function() {
+            injector.inject();
+            injector.inject('Name');
+            injector.inject([],'name');
+            injector.inject(['name'],'name');
+            injector.inject(function() {} ,'name');
+
         });
     });
 
+    describe('Injector.addAll', function() {
+
+        it('should add keys of an object', function() {
+            injector.addAll({
+                't1': 'test',
+                't2': 'test2',
+            });
+            run = false;
+            injector.inject(['name', 'depWithoutArgument','t1','t2'], function(name, depWithoutArgument, t1, t2) {
+                assert.equal(arguments.length, 4);
+                assert.ok(name);
+                assert.equal(name, 'I am a test!');
+                assert.isUndefined(depWithoutArgument);
+                run = true;
+                assert.ok(t1);
+                assert.equal(t1, 'test');
+                assert.ok(t2);
+                assert.equal(t2, 'test2');
+            });
+            assert.equal(run, true);
+
+        });
+    });
+
+    describe('Injector.setDependencies', function() {
+
+        it('should add keys of an object', function() {
+            injector.setDependencies({
+                't3': 'test',
+                't4': 'test2',
+            });
+            run = false;
+            injector.inject(['name', 'depWithoutArgument','t3','t4'], function(name, depWithoutArgument, t1, t2) {
+                assert.equal(arguments.length, 4);
+                assert.isUndefined(name);
+                assert.isUndefined(depWithoutArgument);
+                run = true;
+                assert.ok(t1);
+                assert.equal(t1, 'test');
+                assert.ok(t2);
+                assert.equal(t2, 'test2');
+            });
+            assert.equal(run, true);
+
+        });
+    });
+
+
     describe('Injector.del', function() {
         it('should delete name, so undefined', function() {
-
+            injector.add('name', undefined);
             injector.del('name');
+            injector.add('name2', 1);
+            injector.del('name2');
+            // should not break
+            injector.del({test: 1});
             var run = false;
-            injector.inject(['name'], function(n) {
+            injector.inject(['name','name2'], function(n,m) {
                 assert.isUndefined(n);
+                assert.isUndefined(m);
                 run = true;
             });
             assert.equal(run, true);
         });
     });
+
 });
