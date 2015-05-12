@@ -8,6 +8,11 @@
     "test": "node_modules/.bin/karma start karma.conf.js",
     "mocha": "./node_modules/.bin/mocha --require chai --reporter spec --ui bdd --require src/injector.js test/chai.js"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Thomas-P/Injector.git"
+  },
+  "main": "./src/injector.js",
   "devDependencies": {
     "istanbul": "*",
     "karma": "^0.12.31",

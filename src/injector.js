@@ -67,7 +67,7 @@ var Injector = (function() {
             console.warn('Could not delete the dependency, identifer is not a string');
             return;
         }
-        if (dependencies[name]) {
+        if (dependencies[name] || dependencies.hasOwnProperty(name)) {
             delete(dependencies[name]);
         }
         return dependencies;
@@ -120,7 +120,7 @@ var Injector = (function() {
             return new Injector();
         }
 
-        var dependencies= {};
+        var dependencies = {};
 
 
         /**
@@ -130,6 +130,32 @@ var Injector = (function() {
         */
         this.add = function(name, functionality) {
             addDependency(name, functionality, dependencies);
+            return this;
+        };
+
+
+        /**
+        *    add all keys of an object to the dependencies
+        *    @param dependencyObject {Object} - object with dependencies
+        */
+        this.addAll = function(dependencyObject) {
+            dependencyObject = dependencyObject || {};
+            for (var key in dependencyObject) {
+                if (!dependencyObject.hasOwnProperty(key) ) {
+                    continue;
+                }
+                addDependency(key, dependencyObject[key], dependencies);
+            }
+            return this;
+        };
+
+
+        /**
+        *    replace the dependencies by a given object
+        *    @param dependencyObject {Object} - object that will replace dependencies
+        */
+        this.setDependencies = function(dependencyObject) {
+            dependencies = dependencyObject;
             return this;
         };
 
